@@ -1,5 +1,5 @@
 //
-//  ByteArray.hpp
+//  ByteArray.h
 //  LuaTest38
 //
 //  Created by Buwenjie on 15/9/28.
@@ -23,7 +23,6 @@ class ByteArray {
 public:
     ByteArray(ByteEndian endian);
     
-    void clear();
     void writeInt8(uint8_t data);
     void writeInt16(uint16_t data);
     void writeInt32(uint32_t data);
@@ -37,6 +36,9 @@ public:
     
     byte* first();
     size_t size();
+    
+    void clear();
+    void erase(size_t len);
     
 private:
     std::vector<byte> _buffer;

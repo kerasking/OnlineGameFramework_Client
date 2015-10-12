@@ -13,10 +13,6 @@ ByteArray::ByteArray(ByteEndian endian)
     
 }
 
-void ByteArray::clear() {
-    _buffer.clear();
-}
-
 void ByteArray::writeInt8(uint8_t data) {
     _buffer.push_back(data & 0xff);
 }
@@ -100,4 +96,12 @@ byte* ByteArray::first() {
 
 size_t ByteArray::size() {
     return _buffer.size();
+}
+
+void ByteArray::clear() {
+    _buffer.clear();
+}
+
+void ByteArray::erase(size_t len) {
+    _buffer.erase(_buffer.begin(), _buffer.begin() + len);
 }

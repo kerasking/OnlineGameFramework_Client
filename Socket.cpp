@@ -142,7 +142,7 @@ ssize_t Socket::recv(byte* buffer, size_t size) {
 
 
 int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_size) {
-    printf("异步准备开始...\n");
+    printf("asyncIO start...\n");
     
     _queue_send = new Circularqueue<SendBuffer*>(queue_send_size);
     _queue_recv = new Circularqueue<RecvBuffer*>(queue_recv_size);
@@ -151,10 +151,10 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
     switch(type) {
         case ASYNC_TYPE::KEEP:
             _thread_send = new std::thread([=]() {
-                printf("++++发送线程开始...\n");
+                printf("++++ send thread start...\n");
                 while(running()) {
                     if(!_queue_send->empty()) {
-                        printf("++++发送线程执行...\n");
+                        printf("++++ send thread work...\n");
                         
                         SendBuffer* buf;
                         {
@@ -166,14 +166,14 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
                         delete buf;
                     }
                 }
-                printf("++++发送线程结束...\n");
+                printf("++++ send thread stop...\n");
             });
             
             _thread_recv = new std::thread([=]() {
-                printf("----接收线程开始...\n");
+                printf("---- recv thread start...\n");
                 while(running()) {
                     if(!_queue_recv->empty()) {
-                        printf("----接收线程执行...\n");
+                        printf("---- recv thread work...\n");
                         
                         RecvBuffer* buf;
                         {
@@ -185,7 +185,7 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
                         delete buf;
                     }
                 }
-                printf("----接收线程结束...\n");
+                printf("---- recv thread stop...\n");
             });
             
             break;
@@ -193,17 +193,17 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
             
         case ASYNC_TYPE::AUTO_WAIT:
             _thread_send = new std::thread([=](){
-                printf("++++发送线程开始...\n");
+                printf("++++ send thread start...\n");
                 while(running()) {
                     while(_queue_send->empty() && running()) {
-                        printf("++++发送线程挂起...\n");
+                        printf("++++ send thread wait...\n");
                         
                         std::unique_lock<std::mutex> lock(_mutex_cond_send);
                         _condition_send.wait(lock);
                     }
                     
                     if(running()) {
-                        printf("++++发送线程执行...\n");
+                        printf("++++ send thread work...\n");
                         
                         SendBuffer* buf;
                         {
@@ -215,21 +215,21 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
                         delete buf;
                     }
                 }
-                printf("++++发送线程结束...\n");
+                printf("++++ send thread stop...\n");
             });
             
             _thread_recv = new std::thread([=](){
-                printf("----接收线程开始...\n");
+                printf("---- recv thread start...\n");
                 while(running()) {
                     while(_queue_recv->empty() && running()) {
-                        printf("----接收线程挂起...\n");
+                        printf("---- recv thread wait...\n");
                         
                         std::unique_lock<std::mutex> lock(_mutex_cond_recv);
                         _condition_recv.wait(lock);
                     }
                     
                     if(running()) {
-                        printf("----接收线程执行...\n");
+                        printf("---- recv thread work...\n");
                         
                         RecvBuffer* buf;
                         {
@@ -241,12 +241,12 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
                         delete buf;
                     }
                 }
-                printf("----接收线程结束...\n");
+                printf("---- recv thread stop...\n");
             });
             break;
             
         default:
-            printf("未处理的ASYNC_TYPE\n");
+            printf("unknown ASYNC_TYPE\n");
             break;
     }
     
