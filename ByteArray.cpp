@@ -42,10 +42,11 @@ void ByteArray::writeInt32(uint32_t data) {
 }
 
 void ByteArray::writeString(const std::string& data) {
-    writeInt16(data.size());
     for(auto& d : data) {
         _buffer.push_back(uint8_t(d));
     }
+    // 最后写入0表示字符串结尾
+    _buffer.push_back(uint8_t(0));
 }
 
 void ByteArray::writeBytes(uint8_t* bytes, size_t count) {
@@ -76,18 +77,15 @@ uint32_t ByteArray::readInt32(size_t offset) {
     }
 }
 
-std::string ByteArray::readString(size_t offset, size_t len) {
-    byte* data = first() + offset;
+std::string ByteArray::readString(size_t offset, int& len) {
+    char* data = (char*)(first() + offset);
     
-    char* buf = new char[len+1];
-    for(size_t i = 0; i < len; i++) {
-        buf[i] = data[i];
+    len = 0;
+    while(data[len] != 0) {
+        ++len;
     }
-    buf[len] = 0;
     
-    std::string result(buf);
-    delete[] buf;
-    return result;
+    return std::move(std::string(data, 0, len));
 }
 
 byte* ByteArray::first() {

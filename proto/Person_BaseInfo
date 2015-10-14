@@ -1,0 +1,15 @@
+{
+	"name": "person",
+
+	"send": [
+		"int id",
+		"string name",
+		"int age"
+	],
+
+	"recv": [
+		"int id",
+		"string name",
+		"int age"
+	]
+}

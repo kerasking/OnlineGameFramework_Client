@@ -32,7 +32,7 @@ public:
     uint8_t readInt8(size_t offset);
     uint16_t readInt16(size_t offset);
     uint32_t readInt32(size_t offset);
-    std::string readString(size_t offset, size_t len);
+    std::string readString(size_t offset, int& len);
     
     byte* first();
     size_t size();

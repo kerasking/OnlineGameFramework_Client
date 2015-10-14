@@ -30,7 +30,7 @@ bool ConnectService::running() {
     return _running;
 }
 
-int ConnectService::send_proto(const std::string& proto, const cocos2d::ValueMap& data) {
+int ConnectService::send_proto(const std::string& proto, cocos2d::ValueMap& data) {
     auto bytes = _delegate_proto->pack(proto, data);
     return _socket->async_send(bytes.first(), bytes.size(),
                                std::bind(&ConnectService::on_send, this, std::placeholders::_1));

@@ -4,6 +4,8 @@
 #include <mutex>
 #include "ByteArray.h"
 
+#include "ProtoDelegate.h"
+
 USING_NS_CC;
 using namespace std;
 
@@ -64,9 +66,27 @@ bool HelloWorld::init()
     this->addChild(sprite, 0);
     
     
-    socket = new Socket();
-    socket->async_connect("127.0.0.1", 7464,
-                          std::bind(&HelloWorld::onConnect, this, std::placeholders::_1));
+//    socket = new Socket();
+//    socket->async_connect("127.0.0.1", 7464,
+//                          std::bind(&HelloWorld::onConnect, this, std::placeholders::_1));
+    
+    ProtoDelegate proto;
+    proto.loadAllProto();
+    
+    ValueMap data;
+    data["name"] = Value("aaaa");
+    data["age"] = Value(3);
+    data["id"] = 123;
+    
+    auto bytes = proto.pack("Person_BaseInfo", data);
+    auto un = proto.unpack(bytes);
+    
+    for(int i = 0; i < bytes.size(); i++) {
+        printf("%d ", int(bytes.readInt8(i)));
+    }
+    printf("\n");
+    
+    log("%d %s %d", un["id"].asInt(), un["name"].asString().c_str(), un["age"].asInt());
     
     return true;
 }

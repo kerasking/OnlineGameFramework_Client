@@ -26,7 +26,7 @@ public:
     void run(const char* ip, unsigned short port);
     inline bool running();
     
-    int send_proto(const std::string& proto, const cocos2d::ValueMap& data);
+    int send_proto(const std::string& proto, cocos2d::ValueMap& data);
     
 private:
     void on_connect(bool succ);

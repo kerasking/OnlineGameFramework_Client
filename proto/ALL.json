@@ -1,0 +1,8 @@
+{
+	"protos": [
+	    {
+	    	"id": 100,
+	    	"name": "Person_BaseInfo"
+	    }
+	]
+}
