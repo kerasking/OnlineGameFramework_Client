@@ -49,16 +49,16 @@ void ByteArray::writeString(const std::string& data) {
     _buffer.push_back(uint8_t(0));
 }
 
-void ByteArray::writeBytes(uint8_t* bytes, size_t count) {
+void ByteArray::writeBytes(const uint8_t* bytes, size_t count) {
     _buffer.insert(_buffer.end(), bytes, bytes + count);
 }
 
-uint8_t ByteArray::readInt8(size_t offset) {
+uint8_t ByteArray::readInt8(size_t offset) const {
     return *(first() + offset);
 }
 
-uint16_t ByteArray::readInt16(size_t offset) {
-    byte* data = first() + offset;
+uint16_t ByteArray::readInt16(size_t offset) const {
+    const byte* data = first() + offset;
     
     if(_endian == ByteEndian::LITTLE) {
         return (data[1] << 8) | (data[0]);
@@ -67,8 +67,8 @@ uint16_t ByteArray::readInt16(size_t offset) {
     }
 }
 
-uint32_t ByteArray::readInt32(size_t offset) {
-    byte* data = first() + offset;
+uint32_t ByteArray::readInt32(size_t offset) const {
+    const byte* data = first() + offset;
     
     if(_endian == ByteEndian::LITTLE) {
         return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0]);
@@ -77,7 +77,7 @@ uint32_t ByteArray::readInt32(size_t offset) {
     }
 }
 
-std::string ByteArray::readString(size_t offset, int& len) {
+std::string ByteArray::readString(size_t offset, int& len) const {
     char* data = (char*)(first() + offset);
     
     len = 0;
@@ -88,12 +88,16 @@ std::string ByteArray::readString(size_t offset, int& len) {
     return std::move(std::string(data, 0, len));
 }
 
-byte* ByteArray::first() {
+size_t ByteArray::size() const {
+    return _buffer.size();
+}
+
+const byte* ByteArray::first() const {
     return &_buffer.data()[0];
 }
 
-size_t ByteArray::size() {
-    return _buffer.size();
+ByteEndian ByteArray::endian() const {
+    return _endian;
 }
 
 void ByteArray::clear() {

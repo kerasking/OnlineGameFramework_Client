@@ -14,10 +14,10 @@
 
 class UIThreadTask {
 public:
-    static UIThreadTask* getInstance();
+    cocos2d::ValueVector pop_protos();
+    void                 push_proto(const cocos2d::ValueMap& data);
     
-    cocos2d::ValueVector   pop_protos();
-    void                   push_proto(const cocos2d::ValueMap& data);
+    static UIThreadTask* getInstance();
     
 private:
     UIThreadTask();

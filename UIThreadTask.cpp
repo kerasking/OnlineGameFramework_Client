@@ -17,7 +17,7 @@ UIThreadTask* UIThreadTask::getInstance() {
 }
 
 UIThreadTask::UIThreadTask()
-: _queue_proto(256) {
+: _queue_proto(512) {
     
 }
 
@@ -33,4 +33,3 @@ ValueVector UIThreadTask::pop_protos() {
     
     return std::move(vector);
 }
-

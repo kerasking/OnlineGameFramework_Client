@@ -27,15 +27,16 @@ public:
     void writeInt16(uint16_t data);
     void writeInt32(uint32_t data);
     void writeString(const std::string& data);
-    void writeBytes(uint8_t* bytes, size_t count);
+    void writeBytes(const uint8_t* bytes, size_t count);
     
-    uint8_t readInt8(size_t offset);
-    uint16_t readInt16(size_t offset);
-    uint32_t readInt32(size_t offset);
-    std::string readString(size_t offset, int& len);
+    uint8_t readInt8(size_t offset) const;
+    uint16_t readInt16(size_t offset) const;
+    uint32_t readInt32(size_t offset) const;
+    std::string readString(size_t offset, int& len) const;
     
-    byte* first();
-    size_t size();
+    size_t      size()   const;
+    const byte* first()  const;
+    ByteEndian  endian() const;
     
     void clear();
     void erase(size_t len);

@@ -24,12 +24,12 @@ enum class ASYNC_TYPE {
 };
 
 typedef uint8_t byte;
-typedef std::function<void (ssize_t)> socket_callback;
+typedef const std::function<void (ssize_t)> socket_callback;
 
 class SendBuffer {
 public:
     SendBuffer();
-    SendBuffer(byte* buffer, size_t size, socket_callback callback);
+    SendBuffer(const byte* buffer, size_t size, socket_callback callback);
     
 public:
     std::vector<byte>   _data;
@@ -62,17 +62,17 @@ public:
     bool    listen(ushort port, int size);
     Socket* accept();
     
-    ssize_t send(byte* buffer, size_t size);
+    ssize_t send(const byte* buffer, size_t size);
     ssize_t recv(byte* buffer, size_t size);
     
     int asyncIO_start(ASYNC_TYPE type = ASYNC_TYPE::AUTO_WAIT,
                     int queue_send_size = 1024,
                     int queue_recv_size = 1024);
     
-    int async_send(byte* buffer, size_t size, socket_callback callback);
+    int async_send(const byte* buffer, size_t size, socket_callback callback);
     int async_recv(byte* buffer, size_t size, socket_callback callback);
     
-    void async_connect(const char* ip, ushort port, std::function<void(bool)> callback);
+    void async_connect(const char* ip, ushort port, const std::function<void(bool)> callback);
     
 private:
     bool bind(ushort port);
@@ -84,17 +84,17 @@ private:
     Circularqueue <SendBuffer*>*  _queue_send;
     Circularqueue <RecvBuffer*>*  _queue_recv;
     
-    std::mutex _mutex_queue_send;
-    std::mutex _mutex_queue_recv;
+    mutable std::mutex _mutex_queue_send;
+    mutable std::mutex _mutex_queue_recv;
     
     std::thread* _thread_send;
     std::thread* _thread_recv;
     
-    std::condition_variable _condition_send;
-    std::condition_variable _condition_recv;
+    mutable std::condition_variable _condition_send;
+    mutable std::condition_variable _condition_recv;
     
-    std::mutex _mutex_cond_send;
-    std::mutex _mutex_cond_recv;
+    mutable std::mutex _mutex_cond_send;
+    mutable std::mutex _mutex_cond_recv;
 };
 
 #endif /* defined(__cpp_test__Socket__) */

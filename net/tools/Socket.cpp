@@ -15,7 +15,7 @@
 SendBuffer::SendBuffer() {
 }
 
-SendBuffer::SendBuffer(byte* buffer, size_t size, socket_callback callback)
+SendBuffer::SendBuffer(const byte* buffer, size_t size, socket_callback callback)
 : _callback(callback) {
     _data.reserve(size);
     _data.insert(_data.begin(), buffer, buffer + size);
@@ -123,7 +123,7 @@ bool Socket::connect(const char* ip, ushort port) {
 }
 
 
-ssize_t Socket::send(byte* buffer, size_t size) {
+ssize_t Socket::send(const byte* buffer, size_t size) {
     auto len = ::send(_sockfd, buffer, size, 0);
     if(len < 0) {
         _running = false;
@@ -254,7 +254,7 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
 }
 
 
-int Socket::async_send(byte *buffer, size_t size, socket_callback callback) {
+int Socket::async_send(const byte *buffer, size_t size, socket_callback callback) {
     auto buf = new SendBuffer(buffer, size, callback);
     
     int result = 0;
@@ -294,10 +294,9 @@ int Socket::async_recv(byte *buffer, size_t size, socket_callback callback) {
 }
 
 
-void Socket::async_connect(const char *ip, ushort port, std::function<void(bool)> callback) {
+void Socket::async_connect(const char *ip, ushort port, const std::function<void(bool)> callback) {
     std::thread thread_conn([=]() {
         callback(connect(ip, port));
     });
     thread_conn.detach();
 }
-
