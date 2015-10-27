@@ -1,15 +1,18 @@
 {
-	"name": "person",
+	"name": "Person_BaseInfo",
 
-	"send": [
-		"int id",
-		"string name",
-		"int age"
-	],
+	"enum": {
+		"YES": 1,
+		"NO": 0
+	},
 
-	"recv": [
-		"int id",
-		"string name",
-		"int age"
+	"field": [
+		"id int",
+		"name string",
+		"age int",
+		
+		"a list list int",
+		"c enum",
+		"d list int"
 	]
 }

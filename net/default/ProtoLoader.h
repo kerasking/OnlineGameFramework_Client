@@ -31,7 +31,7 @@ public:
 private:
     ProtoLoader();
     
-    std::map<std::string, int> _map_name;
+    std::map<std::string, int> _map_proto;
     rapidjson::Document _protos[65500];  // 100~65499
 };
 

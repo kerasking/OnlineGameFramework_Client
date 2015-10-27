@@ -40,7 +40,7 @@ void ProtoLoader::loadAllProtos() {
         auto name = proto["name"].GetString();
         
         // 插入到map中
-        _map_name.insert(pair<string, int>(name, id));
+        _map_proto.insert(pair<string, int>(name, id));
         
         // 读取协议文件内容
         string proto_file = string("proto/") + name;
@@ -83,8 +83,8 @@ const rapidjson::Document* ProtoLoader::getProtoById(int id) {
 }
 
 const int ProtoLoader::getIdByName(const std::string& name) {
-    auto it = _map_name.find(name);
-    if(it != _map_name.end()) {
+    auto it = _map_proto.find(name);
+    if(it != _map_proto.end()) {
         return it->second;
     }
     return -1;

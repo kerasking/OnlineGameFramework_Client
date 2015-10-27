@@ -13,6 +13,7 @@
 #include "cocos2d.h"
 
 class Decoder : public DecoderImpl<cocos2d::ValueMap> {
+public:
     virtual int decode(const ByteArray& bytes, cocos2d::ValueMap& dict) override;
 };
 
