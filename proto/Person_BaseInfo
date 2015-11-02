@@ -13,6 +13,7 @@
 		
 		"a list list int",
 		"c enum",
-		"d list int"
+		"d list int",
+		"e struct Person_TestInfo"
 	]
 }

@@ -26,20 +26,18 @@ int Encoder::encode(const cocos2d::ValueMap& dict, ByteArray& bytes) {
     if(proto == nullptr) {
         return -1;
     }
-    
-    // 数据编码，写入body中
-    ByteArray body(ByteEndian::BIG);
-    writeStruct(*proto, dict, body);
 
-    // 写入长度、id、body
     auto id = _loader->getIdByName(name);
     if(id < 0) {
         return -1;
     }
     
-    bytes.writeInt16(body.size() + 2);
+    // 写入id
     bytes.writeInt16(id);
-    bytes.writeBytes(body.first(), body.size());
+    
+    // 写入数据
+    writeStruct(*proto, dict, bytes);
+    
     return 0;
 }
 
@@ -65,7 +63,7 @@ int Encoder::writeStruct(const rapidjson::Value& fields, const ValueMap& dict, B
             result += writeList(subs, 2, value.asValueVector(), bytes);
         }
         else if(type == "struct") {
-            auto struc = _loader->getProtoByName(name);
+            auto struc = _loader->getProtoByName(subs[2]);
             if(struc == nullptr) {
                 return -1;
             }
@@ -75,7 +73,7 @@ int Encoder::writeStruct(const rapidjson::Value& fields, const ValueMap& dict, B
             if(!fields.HasMember("enum")) {
                 return -1;
             }
-            result += writeEnum(fields["enum"], value, bytes);
+            result += writeEnum(fields["enum"], value.asString(), bytes);
         }
         else {
             result += writePrime(type, value, bytes);
@@ -124,8 +122,8 @@ int Encoder::writeList(const vector<string>& subs, int index, const cocos2d::Val
     return result;
 }
 
-int Encoder::writeEnum(const rapidjson::Value& enums, const cocos2d::Value& value, ByteArray& bytes) {
-    auto value_enum = value.asString().c_str();
+int Encoder::writeEnum(const rapidjson::Value& enums, const string& value, ByteArray& bytes) {
+    auto value_enum = value.c_str();
     assert(enums.HasMember(value_enum));
     int value_int = enums[value_enum].GetInt();
     bytes.writeInt8(static_cast<uint8_t>(value_int));
@@ -135,9 +133,11 @@ int Encoder::writeEnum(const rapidjson::Value& enums, const cocos2d::Value& valu
 int Encoder::writePrime(const string& type, const Value& value, ByteArray& bytes) {
     if(type == "int") {
         bytes.writeInt32(value.asInt());
-    } else if(type == "string") {
+    }
+    else if(type == "string") {
         bytes.writeString(value.asString());
-    } else {
+    }
+    else {
         log("unknown type: %s", type.c_str());
         return -1;
     }

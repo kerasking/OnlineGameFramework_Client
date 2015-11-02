@@ -14,10 +14,6 @@
 #include <string>
 #include "ProtoLoader.h"
 
-#include "json/document.h"
-#include "json/writer.h"
-#include "json/stringbuffer.h"
-
 class Encoder : public EncoderImpl<cocos2d::ValueMap> {
 public:
     Encoder();
@@ -31,7 +27,7 @@ private:
     int writeList(const std::vector<std::string>& subs, int index, const cocos2d::ValueVector& array, ByteArray& bytes);
     
     // 写入枚举值
-    int writeEnum(const rapidjson::Value& enums, const cocos2d::Value& value, ByteArray& bytes);
+    int writeEnum(const rapidjson::Value& enums, const std::string& value, ByteArray& bytes);
     
     // 写入基本类型（int, string等）
     int writePrime(const std::string& type, const cocos2d::Value& value, ByteArray& bytes);

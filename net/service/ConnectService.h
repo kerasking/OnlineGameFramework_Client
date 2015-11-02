@@ -26,7 +26,7 @@ public:
     void run(const char* ip, unsigned short port);
     void stop();
     
-    int  sendBytes(const ByteArray& bytes);
+    int  sendProto(const ByteArray& proto);
     
 private:
     void onConnect(bool succ);
@@ -35,7 +35,7 @@ private:
     void onRecv(ssize_t len);
     
     void recvSome();
-    int  checkBytes(const ByteArray& bytes);
+    int  checkBytes(const ByteArray& bytes); // 检查长度，返回消息体（不包括分包需要的前两个字节）的长度
     
     Socket*              _socket;
     ConnDelegateImpl* _delegate;

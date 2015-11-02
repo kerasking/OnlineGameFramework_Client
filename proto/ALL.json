@@ -3,6 +3,11 @@
 	    {
 	    	"id": 100,
 	    	"name": "Person_BaseInfo"
+	    },
+
+	    {
+	    	"id": 101,
+	    	"name": "Person_TestInfo"
 	    }
 	]
 }

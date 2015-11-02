@@ -33,7 +33,10 @@ void ConnectService::stop() {
     _delegate->onDisconnect();
 }
 
-int ConnectService::sendBytes(const ByteArray& bytes) {
+int ConnectService::sendProto(const ByteArray& proto) {
+    ByteArray bytes(proto.endian());
+    bytes.writeInt16(proto.size());
+    bytes.writeBytes(proto.first(), proto.size());
     return _socket->async_send(bytes.first(), bytes.size(),
                                std::bind(&ConnectService::onSend, this, std::placeholders::_1));
 }
@@ -60,8 +63,10 @@ void ConnectService::onRecv(ssize_t len) {
     }
     _bytes.writeBytes(_buffer, len);
     int size = checkBytes(_bytes);
-    if(size > 0) {
-        _delegate->onRecv(_bytes);
+    if(size >= 0) {
+        ByteArray protoBytes(_bytes.endian());
+        protoBytes.writeBytes(_bytes.first()+2, size);
+        _delegate->onRecv(protoBytes);
         
         // 擦除缓冲区的字节
         _bytes.erase(size);
@@ -85,5 +90,5 @@ int ConnectService::checkBytes(const ByteArray& bytes) {
         return -1;
     }
     
-    return len + 2;
+    return len;
 }

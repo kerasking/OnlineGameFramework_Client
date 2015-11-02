@@ -1,0 +1,14 @@
+{
+	"name": "Person_BaseInfo",
+
+	"enum": {
+		"AAA": 123,
+		"BBB": 124
+	},
+
+	"field": [
+		"tel string",
+		"addr string",
+		"e enum"
+	]
+}

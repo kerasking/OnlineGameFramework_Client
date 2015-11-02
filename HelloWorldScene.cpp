@@ -40,6 +40,9 @@ bool HelloWorld::init()
     sprite->setPosition(visibleSize.width / 2, visibleSize.height / 2);
     this->addChild(sprite, 0);
     
+    
+    
+    
     ValueMap data;
     ByteArray bytes(ByteEndian::BIG);
     
@@ -53,24 +56,31 @@ bool HelloWorld::init()
     ValueVector a0;
     a0.push_back(Value(123));
     a0.push_back(Value(124));
-    a0.push_back(Value(125));
     a.push_back(Value(a0));
     
     ValueVector a1;
     a1.push_back(Value(126));
-    a1.push_back(Value(127));
     a.push_back(Value(a1));
     
     data["a"] = a;
     
-    data["c"] = "YES";
+    data["c"] = "NO";
     
     ValueVector d;
     d.push_back(Value(234));
     d.push_back(Value(235));
     d.push_back(Value(236));
-    d.push_back(Value(237));
     data["d"] = d;
+    
+    ValueMap testInfo;
+    testInfo["tel"] = "11111";
+    testInfo["addr"] = "SSSSS";
+    testInfo["e"] = "BBB";
+    
+    data["e"] = testInfo;
+    
+    
+    
     
     ProtoLoader::getInstance()->loadAllProtos();
     auto encoder = new Encoder();
@@ -78,12 +88,40 @@ bool HelloWorld::init()
     
     ProtoService<cocos2d::ValueMap> service(encoder, decoder);
     
+    
     service.encode(data, bytes);
     
     for(int i = 0; i < bytes.size(); i++) {
         printf("%d ", int(bytes.readInt8(i)));
     }
     printf("\n");
+    
+    ValueMap ddd;
+    service.decode(bytes, ddd);
+    
+    log("id: %d", ddd["id"].asInt());
+    log("name: %s", ddd["name"].asString().c_str());
+    log("age: %d", ddd["age"].asInt());
+    
+    auto da = ddd["a"].asValueVector();
+    for(auto& item : da) {
+        auto dda = item.asValueVector();
+        for(auto& dda_item : dda) {
+            log("a: %d", dda_item.asInt());
+        }
+    }
+    
+    log("c: %s", ddd["c"].asString().c_str());
+    
+    auto dd = ddd["d"].asValueVector();
+    for(auto& item : dd) {
+        log("d: %d", item.asInt());
+    }
+    
+    auto de = ddd["e"].asValueMap();
+    log("e_tel: %s", de["tel"].asString().c_str());
+    log("e_addr: %s", de["addr"].asString().c_str());
+    log("e_e: %s", de["e"].asString().c_str());
     
     return true;
 }
