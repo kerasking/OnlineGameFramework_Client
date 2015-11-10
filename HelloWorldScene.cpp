@@ -30,9 +30,6 @@ bool HelloWorld::init()
         return false;
     }
     
-    // 启动游戏。临时写在此处
-    //GameManager::getInstance()->start();
-    
     //scheduleUpdate();
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -43,13 +40,41 @@ bool HelloWorld::init()
     
     
     
+//    ValueMap dict;
+//    dict["_proto_name_"] = "Person_BaseInfo";
+//    dict["id"] = 1;
+//    dict["name"] = "aaaa";
+//    dict["age"] = 18;
+//    dict["gender"] = "BOY";
+//    
+//    ByteArray bytes(ByteEndian::BIG);
+//    
+//    auto game = GameManager::getInstance();
+//    game->protoService()->encode(dict, bytes);
+//    
+//    for(int i = 0; i < bytes.size(); i++) {
+//        printf("%d ", int(bytes.readInt8(i)));
+//    }
+//    printf("\n");
+    
+    //GameManager::getInstance()->sendProto(<#const cocos2d::ValueMap &dict#>);
+    
+    
+    return true;
+}
+
+void HelloWorld::update(float dlt) {
+    
+}
+
+void HelloWorld::test() {
     ValueMap data;
     ByteArray bytes(ByteEndian::BIG);
     
     data["_proto_name_"] = Value("Person_BaseInfo");
     data["id"] = 123;
     data["name"] = Value("aaaa");
-    data["age"] = Value(5);
+    data["age"] = Value(18);
     
     ValueVector a;
     
@@ -78,7 +103,6 @@ bool HelloWorld::init()
     testInfo["e"] = "BBB";
     
     data["e"] = testInfo;
-    
     
     
     
@@ -122,16 +146,4 @@ bool HelloWorld::init()
     log("e_tel: %s", de["tel"].asString().c_str());
     log("e_addr: %s", de["addr"].asString().c_str());
     log("e_e: %s", de["e"].asString().c_str());
-    
-    return true;
-}
-
-void HelloWorld::update(float dlt) {
-    auto protos = UIThreadTask::getInstance()->pop_protos();
-    for(auto& proto : protos) {
-        auto dict = proto.asValueMap();
-        for(auto& key : dict) {
-            log("key: %s", key.first.c_str());
-        }
-    }
 }

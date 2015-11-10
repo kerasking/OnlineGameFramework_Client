@@ -15,6 +15,7 @@ public:
     CREATE_FUNC(HelloWorld);
     
 private:
+    void test();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

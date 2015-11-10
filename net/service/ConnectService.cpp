@@ -16,7 +16,7 @@ ConnectService::ConnectService(ConnDelegateImpl* delegate)
 }
 
 ConnectService::~ConnectService() {
-    delete _delegate;
+    
 }
 
 void ConnectService::run(const char* ip, unsigned short port) {
