@@ -1,0 +1,18 @@
+var server = 2;
+var user = "bu11042";
+document.getElementById("cid").options[1].selected = 'selected'; selectAjax('call.php?action=CallCompanyServers','sid','cid',1);setTimeout(function() {document.getElementById("sid").options[server].selected = 'selected'; selectAjax('player_call.php?action=callGiveaward','award_id','cid|sid',1);$('award_id').options.length = 0;}, 200);document.getElementById("username").value = user;
+
+
+
+
+
+
+0 100 0 0 0 123 97 97 97 97 0 0 0 0 18 0 2 0 1 0 0 0 126 0 0 3 0 0 0 236 49 49 49 49 49 0 83 83 83 83 83 0 124
+0 100 0 0 0 123 97 97 97 97 0 0 0 0 18 0 2 0 2 0 0 0 123 0 0 0 124 0 1 0 0 0 126 0 0 3 0 0 0 234 0 0 0 235 0 0 0 236 49 49 49 49 49 0 83 83 83 83 83 0 124
+0 100 0 0 0 123 97 97 97 97 0 0 0 0 18 0 2 0 2 0 0 0 123 0 0 0 124 0 1 0 0 0 126 0 0 3 0 0 0 234 0 0 0 235 0 0 0 236 49 49 49 49 49 0 83 83 83 83 83 0 124
+
+
+
+
+
+{"name": "Person_BaseInfo","enum": {"YES": 1,"NO": 0},"field": ["id int","name string","age int","a list list int","c enum","d list int","e struct Person_TestInfo"]}
