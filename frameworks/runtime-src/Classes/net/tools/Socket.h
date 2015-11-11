@@ -58,6 +58,7 @@ public:
     ~Socket();
     
     inline bool running();
+    void stop();
     
     bool    connect(const char* ip, uint16_t port);
     bool    listen(uint16_t port, int size);
@@ -77,6 +78,10 @@ public:
     
 private:
     bool bind(uint16_t port);
+    void run_thread_send_keep();
+    void run_thread_recv_keep();
+    void run_thread_send_autowait();
+    void run_thread_recv_autowait();
     
     bool                _running;
     int                 _sockfd;

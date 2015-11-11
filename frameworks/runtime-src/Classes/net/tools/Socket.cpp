@@ -37,7 +37,8 @@ RecvBuffer::RecvBuffer(byte* buffer, size_t size, socket_callback callback)
 Socket::Socket()
 : _running(false)
 , _thread_send(nullptr)
-, _thread_recv(nullptr){
+, _thread_recv(nullptr)
+, _sockfd(-1) {
     
 }
 
@@ -49,27 +50,36 @@ Socket::Socket(int sockfd) : Socket() {
 
 
 Socket::~Socket() {
-    _running = false;
-    
-    _condition_send.notify_all();
-    _condition_recv.notify_all();
-    
-    if(_thread_send) {
-        _thread_send->join();
-        delete _thread_send;
-    }
-    
-    if(_thread_recv) {
-        _thread_recv->join();
-        delete _thread_recv;
-    }
-    
-    close(_sockfd);
+    stop();
 }
 
 
-bool Socket::running() {
+inline bool Socket::running() {
     return _running;
+}
+
+
+void Socket::stop() {
+    _running = false;
+    
+    _condition_send.notify_all();
+    if(_thread_send) {
+        _thread_send->join();
+        delete _thread_send;
+        _thread_send = nullptr;
+    }
+    
+    _condition_recv.notify_all();
+    if(_thread_recv) {
+        _thread_recv->join();
+        delete _thread_recv;
+        _thread_recv = nullptr;
+    }
+    
+    if(_sockfd >= 0) {
+        close(_sockfd);
+        _sockfd = -1;
+    }
 }
 
 
@@ -126,7 +136,7 @@ bool Socket::connect(const char* ip, uint16_t port) {
 
 ssize_t Socket::send(const byte* buffer, size_t size) {
     auto len = ::send(_sockfd, buffer, size, 0);
-    if(len < 0) {
+    if(len <= 0) {
         _running = false;
     }
     return len;
@@ -135,7 +145,7 @@ ssize_t Socket::send(const byte* buffer, size_t size) {
 
 ssize_t Socket::recv(byte* buffer, size_t size) {
     auto len = ::recv(_sockfd, buffer, size, 0);
-    if(len < 0) {
+    if(len <= 0) {
         _running = false;
     }
     return len;
@@ -148,109 +158,21 @@ int Socket::asyncIO_start(ASYNC_TYPE type,  int queue_send_size, int queue_recv_
     _queue_send = new Circularqueue<SendBuffer*>(queue_send_size);
     _queue_recv = new Circularqueue<RecvBuffer*>(queue_recv_size);
     
-    
     switch(type) {
         case ASYNC_TYPE::KEEP:
-            _thread_send = new std::thread([=]() {
-                printf("++++ send thread start...\n");
-                while(running()) {
-                    if(!_queue_send->empty()) {
-                        printf("++++ send thread work...\n");
-                        
-                        SendBuffer* buf;
-                        {
-                            std::lock_guard<std::mutex> lock(_mutex_queue_send);
-                            buf = _queue_send->dequeue();
-                        }
-                        
-                        buf->_callback(this->send(buf->_data.data(), buf->_data.size()));
-                        delete buf;
-                    }
-                }
-                printf("++++ send thread stop...\n");
-            });
-            
-            _thread_recv = new std::thread([=]() {
-                printf("---- recv thread start...\n");
-                while(running()) {
-                    if(!_queue_recv->empty()) {
-                        printf("---- recv thread work...\n");
-                        
-                        RecvBuffer* buf;
-                        {
-                            std::lock_guard<std::mutex> lock(_mutex_queue_send);
-                            buf = _queue_recv->dequeue();
-                        }
-                        
-                        buf->_callback(this->recv(buf->_buffer, buf->_size));
-                        delete buf;
-                    }
-                }
-                printf("---- recv thread stop...\n");
-            });
-            
+            run_thread_send_keep();
+            run_thread_recv_keep();
             break;
             
-            
         case ASYNC_TYPE::AUTO_WAIT:
-            _thread_send = new std::thread([=](){
-                printf("++++ send thread start...\n");
-                while(running()) {
-                    while(_queue_send->empty() && running()) {
-                        printf("++++ send thread wait...\n");
-                        
-                        std::unique_lock<std::mutex> lock(_mutex_cond_send);
-                        _condition_send.wait(lock);
-                    }
-                    
-                    if(running()) {
-                        printf("++++ send thread work...\n");
-                        
-                        SendBuffer* buf;
-                        {
-                            std::lock_guard<std::mutex> lock(_mutex_queue_send);
-                            buf = _queue_send->dequeue();
-                        }
-                        
-                        buf->_callback(this->send(buf->_data.data(), buf->_data.size()));
-                        delete buf;
-                    }
-                }
-                printf("++++ send thread stop...\n");
-            });
-            
-            _thread_recv = new std::thread([=](){
-                printf("---- recv thread start...\n");
-                while(running()) {
-                    while(_queue_recv->empty() && running()) {
-                        printf("---- recv thread wait...\n");
-                        
-                        std::unique_lock<std::mutex> lock(_mutex_cond_recv);
-                        _condition_recv.wait(lock);
-                    }
-                    
-                    if(running()) {
-                        printf("---- recv thread work...\n");
-                        
-                        RecvBuffer* buf;
-                        {
-                            std::lock_guard<std::mutex> lock(_mutex_queue_recv);
-                            buf = _queue_recv->dequeue();
-                        }
-                        
-                        buf->_callback(this->recv(buf->_buffer, buf->_size));
-                        delete buf;
-                    }
-                }
-                printf("---- recv thread stop...\n");
-            });
+            run_thread_send_autowait();
+            run_thread_recv_autowait();
             break;
             
         default:
             printf("unknown ASYNC_TYPE\n");
             break;
     }
-    
     return 0;
 }
 
@@ -300,4 +222,106 @@ void Socket::async_connect(const char *ip, uint16_t port, const std::function<vo
         callback(connect(ip, port));
     });
     thread_conn.detach();
+}
+
+void Socket::run_thread_send_keep() {
+    assert(_thread_send == nullptr);
+    _thread_send = new std::thread([=]() {
+        printf("++++ send thread start...\n");
+        while(running()) {
+            if(!_queue_send->empty()) {
+                printf("++++ send thread work...\n");
+                
+                SendBuffer* buf;
+                {
+                    std::lock_guard<std::mutex> lock(_mutex_queue_send);
+                    buf = _queue_send->dequeue();
+                }
+                
+                buf->_callback(this->send(buf->_data.data(), buf->_data.size()));
+                delete buf;
+            }
+        }
+        printf("++++ send thread stop...\n");
+    });
+}
+
+void Socket::run_thread_recv_keep() {
+    assert(_thread_recv == nullptr);
+    _thread_recv = new std::thread([=]() {
+        printf("---- recv thread start...\n");
+        while(running()) {
+            if(!_queue_recv->empty()) {
+                printf("---- recv thread work...\n");
+                
+                RecvBuffer* buf;
+                {
+                    std::lock_guard<std::mutex> lock(_mutex_queue_send);
+                    buf = _queue_recv->dequeue();
+                }
+                
+                buf->_callback(this->recv(buf->_buffer, buf->_size));
+                delete buf;
+            }
+        }
+        printf("---- recv thread stop...\n");
+    });
+}
+
+void Socket::run_thread_send_autowait() {
+    assert(_thread_send == nullptr);
+    _thread_send = new std::thread([=](){
+        printf("++++ send thread start...\n");
+        while(running()) {
+            while(_queue_send->empty() && running()) {
+                printf("++++ send thread wait...\n");
+                
+                std::unique_lock<std::mutex> lock(_mutex_cond_send);
+                _condition_send.wait(lock);
+            }
+            
+            if(running()) {
+                printf("++++ send thread work...\n");
+                
+                SendBuffer* buf;
+                {
+                    std::lock_guard<std::mutex> lock(_mutex_queue_send);
+                    buf = _queue_send->dequeue();
+                }
+                
+                buf->_callback(this->send(buf->_data.data(), buf->_data.size()));
+                delete buf;
+            }
+        }
+        printf("++++ send thread stop...\n");
+    });
+}
+
+void Socket::run_thread_recv_autowait() {
+    assert(_thread_recv == nullptr);
+    _thread_recv = new std::thread([=](){
+        printf("---- recv thread start...\n");
+        while(running()) {
+            while(_queue_recv->empty() && running()) {
+                printf("---- recv thread wait...\n");
+                
+                std::unique_lock<std::mutex> lock(_mutex_cond_recv);
+                _condition_recv.wait(lock);
+            }
+            
+            if(running()) {
+                printf("---- recv thread work...\n");
+                
+                RecvBuffer* buf;
+                {
+                    std::lock_guard<std::mutex> lock(_mutex_queue_recv);
+                    buf = _queue_recv->dequeue();
+                }
+                
+                buf->_callback(this->recv(buf->_buffer, buf->_size));
+                delete buf;
+            }
+        }
+        printf("---- recv thread stop...\n");
+    });
 }

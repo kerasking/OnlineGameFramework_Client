@@ -52,14 +52,15 @@ void ConnectService::onDisconnect() {
 }
 
 void ConnectService::onSend(ssize_t len) {
-    if(len < 0) {
+    if(len <= 0) {
         _delegate->onError();
     }
 }
 
 void ConnectService::onRecv(ssize_t len) {
-    if(len < 0) {
+    if(len <= 0) {
         _delegate->onError();
+        return;
     }
     _bytes.writeBytes(_buffer, len);
     int size = checkBytes(_bytes);

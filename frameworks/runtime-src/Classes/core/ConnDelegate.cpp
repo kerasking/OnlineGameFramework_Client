@@ -24,6 +24,10 @@ void ConnDelegate::onDisconnect() {
 
 void ConnDelegate::onError() {
     log("[CPP] connect error!");
+    // 在主线程中结束，避免死锁
+    UIThreadTask::getInstance()->push_task([]() {
+        GameManager::getInstance()->stop();
+    });
     Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("CONNECT_ERROR");
 }
 
