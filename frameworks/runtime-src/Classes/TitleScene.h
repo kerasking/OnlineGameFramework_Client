@@ -19,6 +19,8 @@ public:
     
     CREATE_FUNC(TitleScene);
     
+    void onConnect(cocos2d::EventCustom* event);
+    
 private:
     
 };

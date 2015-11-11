@@ -19,9 +19,12 @@ bool TitleScene::init() {
     // 初始化并启动游戏。临时写在此处
     auto gameManager = GameManager::getInstance();
     gameManager->init();
-    gameManager->connDelegate()->bindConnect([](){
-        log("[Red] do conn");
-    });
+//    gameManager->connDelegate()->bindConnect([](){
+//        log("[Red] do conn");
+//    });
+    
+    auto customListener = EventListenerCustom::create("CONNECT", CC_CALLBACK_1(TitleScene::onConnect, this));
+    getEventDispatcher()->addEventListenerWithFixedPriority(customListener, 1);
     
     gameManager->start();
     
@@ -38,4 +41,8 @@ void TitleScene::update(float dlt) {
         auto proto = item.asValueMap();
         log("do proto: %s", proto["_proto_name_"].asString().c_str());
     }
+}
+
+void TitleScene::onConnect(EventCustom *event) {
+    log("[Red] do conn ...");
 }
