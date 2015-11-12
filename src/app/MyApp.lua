@@ -1,8 +1,17 @@
 
-local MyApp = class("MyApp", cc.load("mvc").AppBase)
+require("config")
+require("cocos.init")
+require("framework.init")
 
-function MyApp:onCreate()
-    math.randomseed(os.time())
+local MyApp = class("MyApp", cc.mvc.AppBase)
+
+function MyApp:ctor()
+    MyApp.super.ctor(self)
+end
+
+function MyApp:run()
+    cc.FileUtils:getInstance():addSearchPath("res/")
+    self:enterScene("MainScene")
 end
 
 return MyApp

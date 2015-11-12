@@ -42,9 +42,13 @@ int ConnectService::sendProto(const ByteArray& proto) {
 }
 
 void ConnectService::onConnect(bool succ) {
-    _socket->asyncIO_start();
-    _delegate->onConnect();
-    recvSome();
+    if(succ) {
+        _delegate->onConnect();
+        _socket->asyncIO_start();
+        recvSome();
+    } else {
+        _delegate->onError();
+    }
 }
 
 void ConnectService::onDisconnect() {

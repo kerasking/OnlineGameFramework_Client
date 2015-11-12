@@ -4,23 +4,52 @@
 #include "cocos2d.h"
 #include "lua_module_register.h"
 
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_LINUX)
-#include "ide-support/CodeIDESupport.h"
-#endif
 
-#if (COCOS2D_DEBUG > 0) && (CC_CODE_IDE_DEBUG_SUPPORT > 0)
-#include "runtime/Runtime.h"
-#include "ide-support/RuntimeLuaImpl.h"
+// extra lua module
+#include "cocos2dx_extra.h"
+#include "lua_extensions/lua_extensions_more.h"
+#include "luabinding/lua_cocos2dx_extension_filter_auto.hpp"
+#include "luabinding/lua_cocos2dx_extension_nanovg_auto.hpp"
+#include "luabinding/lua_cocos2dx_extension_nanovg_manual.hpp"
+#include "luabinding/cocos2dx_extra_luabinding.h"
+#include "luabinding/HelperFunc_luabinding.h"
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#include "luabinding/cocos2dx_extra_ios_iap_luabinding.h"
+#endif
+#if ANYSDK_DEFINE > 0
+#include "anysdkbindings.h"
+#include "anysdk_manual_bindings.h"
 #endif
 
 #include "lua_red_luabinding_auto.hpp"
-#include "TitleScene.h"
 
 using namespace CocosDenshion;
 
 USING_NS_CC;
 using namespace std;
 
+static void quick_module_register(lua_State *L)
+{
+    luaopen_lua_extensions_more(L);
+
+    lua_getglobal(L, "_G");
+    if (lua_istable(L, -1))//stack:...,_G,
+    {
+        register_all_quick_manual(L);
+        // extra
+        luaopen_cocos2dx_extra_luabinding(L);
+        register_all_cocos2dx_extension_filter(L);
+        register_all_cocos2dx_extension_nanovg(L);
+        register_all_cocos2dx_extension_nanovg_manual(L);
+        luaopen_HelperFunc_luabinding(L);
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+        luaopen_cocos2dx_extra_ios_iap_luabinding(L);
+#endif
+    }
+    lua_pop(L, 1);
+}
+
+//
 AppDelegate::AppDelegate()
 {
 }
@@ -28,12 +57,6 @@ AppDelegate::AppDelegate()
 AppDelegate::~AppDelegate()
 {
     SimpleAudioEngine::end();
-
-#if (COCOS2D_DEBUG > 0) && (CC_CODE_IDE_DEBUG_SUPPORT > 0)
-    // NOTE:Please don't remove this call if you want to debug with Cocos Code IDE
-    RuntimeEngine::getInstance()->end();
-#endif
-
 }
 
 //if you want a different context,just modify the value of glContextAttrs
@@ -42,53 +65,61 @@ void AppDelegate::initGLContextAttrs()
 {
     //set OpenGL context attributions,now can only set six attributions:
     //red,green,blue,alpha,depth,stencil
-    GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8};
+    GLContextAttrs glContextAttrs = { 8, 8, 8, 8, 24, 8 };
 
     GLView::setGLContextAttrs(glContextAttrs);
 }
 
-// If you want to use packages manager to install more packages,
-// don't modify or remove this function
-static int register_all_packages()
-{
-    return 0; //flag for packages manager
-}
-
 bool AppDelegate::applicationDidFinishLaunching()
 {
-    // set default FPS
-    Director::getInstance()->setAnimationInterval(1.0 / 60.0f);
-
-    // register lua module
+    // initialize director
+    auto director = Director::getInstance();
+    auto glview = director->getOpenGLView();    
+    if(!glview) {
+        string title = "OnlineGameFramework_Client";
+        glview = cocos2d::GLViewImpl::create(title.c_str());
+        director->setOpenGLView(glview);
+        director->startAnimation();
+    }
+   
     auto engine = LuaEngine::getInstance();
     ScriptEngineManager::getInstance()->setScriptEngine(engine);
     lua_State* L = engine->getLuaStack()->getLuaState();
     lua_module_register(L);
 
-    register_all_packages();
+    // use Quick-Cocos2d-X
+    quick_module_register(L);
 
     LuaStack* stack = engine->getLuaStack();
-    stack->setXXTEAKeyAndSign("2dxLua", strlen("2dxLua"), "XXTEA", strlen("XXTEA"));
-    
-    register_all_red_luabinding(stack->getLuaState());
+#if ANYSDK_DEFINE > 0
+    lua_getglobal(stack->getLuaState(), "_G");
+    tolua_anysdk_open(stack->getLuaState());
+    tolua_anysdk_manual_open(stack->getLuaState());
+    lua_pop(stack->getLuaState(), 1);
+#endif
 
     //register custom function
     //LuaStack* stack = engine->getLuaStack();
     //register_custom_function(stack->getLuaState());
+    
+    register_all_red_luabinding(stack->getLuaState());
+    
+    //FileUtils::getInstance()->setResourceEncryptKeyAndSign("test", "XXTEA");
+#if 0
+    // use luajit bytecode package
+    stack->setXXTEAKeyAndSign("2dxLua", "XXTEA");
 
-#if (COCOS2D_DEBUG > 0) && (CC_CODE_IDE_DEBUG_SUPPORT > 0)
-    // NOTE:Please don't remove this call if you want to debug with Cocos Code IDE
-    auto runtimeEngine = RuntimeEngine::getInstance();
-    runtimeEngine->addRuntime(RuntimeLuaImpl::create(), kRuntimeEngineLua);
-    runtimeEngine->start();
-#else
-    if (engine->executeScriptFile("src/main.lua"))
-    {
-        return false;
+    if (sizeof(long) == 4) {
+        stack->loadChunksFromZIP("res/game.zip");
+    } else {
+        stack->loadChunksFromZIP("res/game64.zip");
     }
+    stack->executeString("require 'main'");
+#else
+    // use discrete files
+    engine->executeScriptFile("src/main.lua");
 #endif
 
-    //Director::getInstance()->runWithScene(TitleScene::create());
     return true;
 }
 
@@ -96,14 +127,22 @@ bool AppDelegate::applicationDidFinishLaunching()
 void AppDelegate::applicationDidEnterBackground()
 {
     Director::getInstance()->stopAnimation();
+    Director::getInstance()->pause();
 
     SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    SimpleAudioEngine::getInstance()->pauseAllEffects();
+
+    Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("APP_ENTER_BACKGROUND_EVENT");
 }
 
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground()
 {
+    Director::getInstance()->resume();
     Director::getInstance()->startAnimation();
 
     SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    SimpleAudioEngine::getInstance()->resumeAllEffects();
+
+    Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("APP_ENTER_FOREGROUND_EVENT");
 }

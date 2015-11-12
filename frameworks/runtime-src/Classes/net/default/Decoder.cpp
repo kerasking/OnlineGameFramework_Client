@@ -127,7 +127,7 @@ int Decoder::readEnum(const rapidjson::Value& enums, const ByteArray& bytes, str
     int value_int = static_cast<int>(bytes.readInt8(_offset));
     _offset += 1;
     
-    for(auto it = enums.MemberBegin(); it != enums.MemberEnd(); ++it) {
+    for(auto it = enums.MemberonBegin(); it != enums.MemberonEnd(); ++it) {
         if(it->value.GetInt() == value_int) {
             value = it->name.GetString();
             return 0;
