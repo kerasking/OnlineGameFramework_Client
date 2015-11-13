@@ -22,7 +22,7 @@ function MainScene:ctor()
             event.target:setScale(1.0)
         end)
         :onButtonClicked(function(event)
-            NotifyManager:pub(event.target, "CLICK")
+            Notify:pub(event.target, "CLICK")
         end)
         :pos(display.cx - 300, display.bottom + 100)
         :addTo(self)
@@ -39,7 +39,8 @@ function MainScene:hahaclick(signal)
 end
 
 function MainScene:onEnter()
-    
+    Notify:rmReceiver(self)
+    --self._btn:removeSelf()
 
 
 	-- local uiTask = function()

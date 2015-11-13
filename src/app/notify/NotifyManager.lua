@@ -56,8 +56,10 @@ end
 function NotifyManager:rmReceiver(receiver)
 	-- 这个目前实现不够理想，需要遍历所有signal，删除其中的receiver
 	local pool = self._signalpool
-	for _, v in pairs(pool) do
-		v:rmReceiver(receiver)
+	for _, signals in pairs(pool) do
+		for _, signal in pairs(signals) do
+			signal:rmReceiver(receiver)
+		end
 	end
 end
 

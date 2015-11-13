@@ -34,13 +34,12 @@ end
 function Signal:rmReceiver(receiver)
 	local slots = self._slots
 	local i = 1
-	while i < #slots do
+	while i <= #slots do
 		local slot = slots[i]
 		if slot:receiver() == receiver then
-			table.remove(slots, slot)
-			else
-				i = i + 1
-			end
+			table.remove(slots, i)
+		else
+			i = i + 1
 		end
 	end
 end
