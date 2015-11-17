@@ -1,6 +1,8 @@
 local scheduler = require("framework.scheduler")
 local TestScene = require("app.scenes.TestScene")
 local Notify = require("app.notify.NotifyManager").getInstance()
+local binding = require("app.databinding.DataBinding")
+local MyButton = require("app.gui.MyButton")
 
 local MainScene = class("MainScene", function()
     return display.newScene("MainScene")
@@ -12,18 +14,9 @@ function MainScene:ctor()
         :align(display.CENTER, display.cx, display.cy)
         :addTo(self)
 
-    self._btn = cc.ui.UIPushButton.new("Button01.png", {scale9 = true})
+    self._btn = MyButton.new("Button01.png", {scale9 = true})
         :setButtonSize(160, 80)
         :setButtonLabel(cc.ui.UILabel.new({text = "Button"}))
-        :onButtonPressed(function(event)
-            event.target:setScale(1.1)
-        end)
-        :onButtonRelease(function(event)
-            event.target:setScale(1.0)
-        end)
-        :onButtonClicked(function(event)
-            Notify:pub(event.target, "CLICK")
-        end)
         :pos(display.cx - 300, display.bottom + 100)
         :addTo(self)
 
@@ -32,6 +25,57 @@ function MainScene:ctor()
     end)
 
     Notify:sub(self._btn, "CLICK", self, self.hahaclick)
+
+
+    local str = ""
+    str = binding.bind(str, self._btn.Text)
+
+    function self._btn.Text:_filter_(value)
+        if #value <= 5 then
+            return value
+        else
+            return string.sub(value, 1, 5) .. "..."
+        end
+    end
+
+    Notify:sub(self._btn, "CLICK", self, function()
+        binding.set(str, binding.get(str) .. "A")
+        print("str:", binding.get(str))
+    end)
+end
+
+function MainScene:testDataBinding()
+    local a = 111
+    local b = 222
+    local c = 333
+
+    -- a, b = binding.bind(a, b)
+    -- a, b = binding.bindTwoWay(a, b)
+    -- a, b, c = binding.bindOneWay(a, b, c)
+    -- a, b, c = binding.bindCircle(a, b, c)
+
+    a, b = binding.bind(a, b)
+    a, c = binding.bind(a, c)
+
+    function a:_valueChange_(value)
+        print("a change", value)
+    end
+
+    function b:_valueChange_(value)
+        print("b change", value)
+    end
+
+    function c:_valueChange_(value)
+        print("c change", value)
+    end
+
+    function c:_filter_(value)
+        return value / 10
+    end
+
+    binding.set(a, 200)
+    -- db.set(a, 300)
+    print(binding.get(a), binding.get(b), binding.get(c))
 end
 
 function MainScene:hahaclick(signal)
@@ -39,8 +83,8 @@ function MainScene:hahaclick(signal)
 end
 
 function MainScene:onEnter()
-    Notify:rmReceiver(self)
-    --self._btn:removeSelf()
+    -- Notify:rmReceiver(self)
+    -- self._btn:removeSelf()
 
 
 	-- local uiTask = function()
