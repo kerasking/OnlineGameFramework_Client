@@ -54,11 +54,6 @@ Socket::~Socket() {
 }
 
 
-inline bool Socket::running() {
-    return _running;
-}
-
-
 void Socket::stop() {
     _running = false;
     

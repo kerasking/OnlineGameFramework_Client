@@ -6,17 +6,18 @@
 //
 //
 
-#ifndef Circularqueue_hpp
-#define Circularqueue_hpp
+#ifndef __Circularqueue_hpp__
+#define __Circularqueue_hpp__
 
 #include <cassert>
 
 template <typename T>
 class Node {
 public:
-    Node() {
-        _next = nullptr;
-        _last = nullptr;
+    Node()
+    : _next(nullptr)
+    , _last(nullptr) {
+        
     }
     
     inline const T& data() {
@@ -140,4 +141,4 @@ private:
     int _cap;
 };
 
-#endif /* CircleQueue_hpp */
+#endif /* __Circularqueue_hpp__ */

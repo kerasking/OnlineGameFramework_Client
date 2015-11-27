@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef __cpp_test__Socket__
-#define __cpp_test__Socket__
+#ifndef __Socket_h__
+#define __Socket_h__
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -57,7 +57,10 @@ public:
     
     ~Socket();
     
-    inline bool running();
+    inline bool running() {
+        return _running;
+    }
+    
     void stop();
     
     bool    connect(const char* ip, uint16_t port);
@@ -103,4 +106,4 @@ private:
     mutable std::mutex _mutex_cond_recv;
 };
 
-#endif /* defined(__cpp_test__Socket__) */
+#endif /* __Socket_h__ */
