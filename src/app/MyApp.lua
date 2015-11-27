@@ -3,6 +3,9 @@ require("config")
 require("cocos.init")
 require("framework.init")
 
+require("app.expand.init")
+require("app.gui.init")
+
 local MyApp = class("MyApp", cc.mvc.AppBase)
 
 function MyApp:ctor()

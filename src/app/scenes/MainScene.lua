@@ -2,47 +2,53 @@ local scheduler = require("framework.scheduler")
 local TestScene = require("app.scenes.TestScene")
 local Notify = require("app.notify.NotifyManager").getInstance()
 local binding = require("app.databinding.DataBinding")
-local MyButton = require("app.gui.MyButton")
 
 local MainScene = class("MainScene", function()
     return display.newScene("MainScene")
 end)
 
 function MainScene:ctor()
-    cc.ui.UILabel.new({
-            UILabelType = 2, text = "Hello, World123", size = 64})
-        :align(display.CENTER, display.cx, display.cy)
+    local btn = red.ui.Button.new()
+        :setImage("Button01.png", "Button01.png", "Button01.png")
+        :pos(300, 300)
         :addTo(self)
-
-    self._btn = MyButton.new("Button01.png", {scale9 = true})
-        :setButtonSize(160, 80)
-        :setButtonLabel(cc.ui.UILabel.new({text = "Button"}))
-        :pos(display.cx - 300, display.bottom + 100)
-        :addTo(self)
-
-    Notify:sub(self._btn, "CLICK", self, function(recver, signal)
-        print("lambda " .. signal:name())
-    end)
-
-    Notify:sub(self._btn, "CLICK", self, self.hahaclick)
-
-
-    local str = ""
-    str = binding.bind(str, self._btn.Text)
-
-    function self._btn.Text:_filter_(value)
-        if #value <= 5 then
-            return value
-        else
-            return string.sub(value, 1, 5) .. "..."
-        end
-    end
-
-    Notify:sub(self._btn, "CLICK", self, function()
-        binding.set(str, binding.get(str) .. "A")
-        print("str:", binding.get(str))
-    end)
 end
+
+-- function MainScene:ctor()
+--     cc.ui.UILabel.new({
+--             UILabelType = 2, text = "Hello, World123", size = 64})
+--         :align(display.CENTER, display.cx, display.cy)
+--         :addTo(self)
+
+--     self._btn = MyButton.new("Button01.png", {scale9 = true})
+--         :setButtonSize(160, 80)
+--         :setButtonLabel(cc.ui.UILabel.new({text = "Button"}))
+--         :pos(display.cx - 300, display.bottom + 100)
+--         :addTo(self)
+
+--     Notify:sub(self._btn, "CLICK", self, function(recver, signal)
+--         print("lambda " .. signal:name())
+--     end)
+
+--     Notify:sub(self._btn, "CLICK", self, self.hahaclick)
+
+
+--     local str = ""
+--     str = binding.bind(str, self._btn.Text)
+
+--     function self._btn.Text:_filter_(value)
+--         if #value <= 5 then
+--             return value
+--         else
+--             return string.sub(value, 1, 5) .. "..."
+--         end
+--     end
+
+--     Notify:sub(self._btn, "CLICK", self, function()
+--         binding.set(str, binding.get(str) .. "A")
+--         print("str:", binding.get(str))
+--     end)
+-- end
 
 function MainScene:testDataBinding()
     local a = 111
