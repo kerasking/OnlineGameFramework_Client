@@ -8,10 +8,16 @@ local MainScene = class("MainScene", function()
 end)
 
 function MainScene:ctor()
-    local btn = red.ui.Button.new()
-        :setImage("Button01.png", "Button01.png", "Button01.png")
+    local Button = red.ui.Button
+
+    local btn = Button.new()
+        :setImage("按钮默认.png", "按钮按下.png", "按钮灰.png")
         :pos(300, 300)
         :addTo(self)
+
+    Notify:sub(btn, "Click", self, function(receiver, signal)
+        print("click...")
+    end)
 end
 
 -- function MainScene:ctor()
