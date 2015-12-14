@@ -13,6 +13,8 @@
 #include "cocos2d.h"
 #include "ProtoLoader.h"
 
+namespace red {
+    
 class Decoder : public DecoderImpl<cocos2d::ValueMap> {
 public:
     Decoder();
@@ -34,5 +36,7 @@ private:
     ProtoLoader* _loader;
     size_t _offset;
 };
+    
+}
 
 #endif /* Decoder_h */

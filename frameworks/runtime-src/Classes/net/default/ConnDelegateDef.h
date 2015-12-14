@@ -11,6 +11,8 @@
 
 #include "net/impl/ConnDelegateImpl.h"
 
+namespace red {
+
 class ConnDelegateDef : public ConnDelegateImpl {
 public:
     virtual void onConnect() override;
@@ -18,5 +20,7 @@ public:
     virtual void onError() override;
     virtual void onRecv(const ByteArray& bytes) override;
 };
+    
+}
 
 #endif /* ConnDelegateDef_h */

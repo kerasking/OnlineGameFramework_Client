@@ -10,6 +10,7 @@
 
 USING_NS_CC;
 using namespace std;
+using namespace red;
 
 Encoder::Encoder() {
     _loader = ProtoLoader::getInstance();

@@ -11,6 +11,7 @@
 
 USING_NS_CC;
 using namespace std;
+using namespace red;
 
 Decoder::Decoder()
 : _offset(0) {

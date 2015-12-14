@@ -10,6 +10,7 @@
 #include <utility>
 
 USING_NS_CC;
+using namespace red;
 
 UIThreadTask* UIThreadTask::getInstance() {
     static UIThreadTask instance;

@@ -10,6 +10,7 @@
 #include "GameManager.h"
 
 USING_NS_CC;
+using namespace red;
 
 bool TitleScene::init() {
     if(!Scene::init()) {

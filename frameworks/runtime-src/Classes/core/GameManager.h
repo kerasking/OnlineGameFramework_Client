@@ -15,6 +15,8 @@
 #include "net/default/Decoder.h"
 #include "ConnDelegate.h"
 
+namespace red {
+
 // 为了绑定到lua，不能使用模板类，因此此处写一个子类
 class ProtoServiceEntity : public ProtoService<cocos2d::ValueMap> {
 public:
@@ -44,5 +46,7 @@ private:
     
     ConnDelegate* _delegate_conn;
 };
+    
+}
 
 #endif /* GameManager_h */

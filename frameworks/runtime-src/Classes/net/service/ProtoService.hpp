@@ -12,6 +12,8 @@
 #include "net/impl/EncoderImpl.h"
 #include "net/impl/DecoderImpl.h"
 
+namespace red {
+
 template <typename MAP>
 class ProtoService {
 public:
@@ -34,5 +36,7 @@ private:
     EncoderImpl<MAP>* _encoder;
     DecoderImpl<MAP>* _decoder;
 };
+    
+}
 
 #endif /* ProtoService_h */

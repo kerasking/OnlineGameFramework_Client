@@ -14,6 +14,8 @@
 #include <string>
 #include "ProtoLoader.h"
 
+namespace red {
+    
 class Encoder : public EncoderImpl<cocos2d::ValueMap> {
 public:
     Encoder();
@@ -34,5 +36,7 @@ private:
     
     ProtoLoader* _loader;
 };
+    
+}
 
 #endif /* Encoder_h */

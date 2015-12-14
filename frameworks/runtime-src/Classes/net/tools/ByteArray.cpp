@@ -8,6 +8,8 @@
 
 #include "ByteArray.h"
 
+using namespace red;
+
 ByteArray::ByteArray(ByteEndian endian)
 : _endian(endian) {
     

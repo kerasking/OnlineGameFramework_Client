@@ -9,6 +9,8 @@
 #include "ConnectService.h"
 #include <functional>
 
+using namespace red;
+
 ConnectService::ConnectService(ConnDelegateImpl* delegate)
 : _bytes(ByteEndian::BIG)
 , _delegate(delegate) {

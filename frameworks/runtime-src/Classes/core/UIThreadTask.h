@@ -15,6 +15,8 @@
 #include <functional>
 #include <mutex>
 
+namespace red {
+    
 typedef std::function<void()> Task;
 
 class UIThreadTask {
@@ -39,5 +41,7 @@ private:
     std::mutex _mutex_proto;
     std::mutex _mutex_task;
 };
+    
+}
 
 #endif /* UIThreadTask_h */

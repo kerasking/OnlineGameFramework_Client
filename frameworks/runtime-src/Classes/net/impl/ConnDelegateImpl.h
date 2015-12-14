@@ -11,6 +11,8 @@
 
 #include "net/tools/ByteArray.h"
 
+namespace red {
+    
 class ConnDelegateImpl {
 public:
     virtual ~ConnDelegateImpl() {}
@@ -20,5 +22,7 @@ public:
     virtual void onError() = 0;
     virtual void onRecv(const ByteArray& bytes) = 0;
 };
+
+}
 
 #endif /* ConnDelegateImpl_h */

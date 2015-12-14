@@ -17,6 +17,8 @@
 #include "json/writer.h"
 #include "json/stringbuffer.h"
 
+namespace red {
+    
 class ProtoLoader {
 public:
     static ProtoLoader* getInstance();
@@ -34,5 +36,7 @@ private:
     std::map<std::string, int> _map_proto;
     rapidjson::Document _protos[65500];  // 100~65499
 };
+    
+}
 
 #endif /* ProtoLoader_h */

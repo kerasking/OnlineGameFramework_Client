@@ -4,6 +4,7 @@
 #include "tolua_fix.h"
 #include "LuaBasicConversions.h"
 
+using namespace red;
 
 int lua_red_luabinding_UIThreadTask_push_task(lua_State* tolua_S)
 {

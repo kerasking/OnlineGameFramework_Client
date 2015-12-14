@@ -11,6 +11,8 @@
 
 #include "net/tools/ByteArray.h"
 
+namespace red {
+    
 template <typename MAP>
 class EncoderImpl {
 public:
@@ -18,5 +20,7 @@ public:
     
     virtual int encode(const MAP& dict, ByteArray& bytes) = 0;
 };
+    
+}
 
 #endif /* EncoderImpl_h */

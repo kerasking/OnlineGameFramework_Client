@@ -8,6 +8,8 @@
 
 #include "ConnDelegateDef.h"
 
+using namespace red;
+
 void ConnDelegateDef::onConnect() {
     
 }

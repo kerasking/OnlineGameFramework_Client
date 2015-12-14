@@ -11,6 +11,7 @@
 #include "cocos2d.h"
 
 USING_NS_CC;
+using namespace red;
 
 void ConnDelegate::onConnect() {
     log("[CPP] connect connect!");

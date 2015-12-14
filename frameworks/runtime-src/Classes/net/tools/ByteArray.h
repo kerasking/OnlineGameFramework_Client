@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+namespace red {
+    
 typedef uint8_t byte;
 
 enum class ByteEndian {
@@ -45,5 +47,7 @@ private:
     std::vector<byte> _buffer;
     ByteEndian _endian;
 };
+    
+}
 
 #endif /* ByteArray_h */

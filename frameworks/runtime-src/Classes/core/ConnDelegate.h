@@ -12,6 +12,8 @@
 #include "net/impl/ConnDelegateImpl.h"
 #include "UIThreadTask.h"
 
+namespace red {
+
 class ConnDelegate : public ConnDelegateImpl {
 public:
     virtual void onConnect() override;
@@ -22,5 +24,7 @@ public:
 private:
     
 };
+    
+}
 
 #endif /* ConnDelegate_h */

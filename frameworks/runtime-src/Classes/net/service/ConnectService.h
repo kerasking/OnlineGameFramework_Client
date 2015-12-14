@@ -16,6 +16,8 @@
 #include "net/tools/ByteArray.h"
 #include "net/impl/ConnDelegateImpl.h"
 
+namespace red {
+
 const size_t BUFFER_SIZE = 1024 * 8;
 
 class ConnectService {
@@ -44,4 +46,5 @@ private:
     ByteArray _bytes;
 };
 
+}
 #endif /* ConnectService_h */

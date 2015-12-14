@@ -14,3 +14,10 @@ function Node:checkTouch(x, y)
 	end
 	return self:getCascadeBoundingBox():containsPoint(point)
 end
+
+-- 修改Node的构造函数
+-- local ctor_old = Node.create
+-- function Node:create()
+-- 	ctor_old(Node)
+-- 	print("[Red] Node create...")
+-- end

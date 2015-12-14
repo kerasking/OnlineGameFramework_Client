@@ -10,6 +10,7 @@
 #include "net/default/ProtoLoader.h"
 
 USING_NS_CC;
+using namespace red;
 
 ProtoServiceEntity::ProtoServiceEntity(Encoder* encoder, Decoder* decoder)
 : ProtoService(encoder, decoder) {
